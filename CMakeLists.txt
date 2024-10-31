@@ -32,3 +32,7 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++14")
 add_executable(build src/build.cpp)
 target_link_libraries(build sdsl)
 target_compile_options(build PUBLIC -O2)
+
+add_executable(load src/deserialize.cpp)
+target_link_libraries(load sdsl)
+target_compile_options(load PUBLIC -O2)

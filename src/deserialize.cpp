@@ -1,4 +1,5 @@
 #include <sdsl/int_vector.hpp>
+#include <sdsl/sd_vector.hpp>
 #include <sdsl/rank_support.hpp>
 #include <sdsl/bit_vectors.hpp>
 
@@ -19,15 +20,20 @@ std::vector<unsigned char> alphabet;
 std::vector<int> char_to_index;
 
 // The data structures needed for the assignment
-sdsl::bit_vector B_F;
-sdsl::bit_vector B_L;
+sdsl::sd_vector B_F_sparse;
+sdsl::sd_vector B_L_sparse;
+
 std::vector<int> C;
 std::vector<char> H_L;
 // std::vector<std::unique_ptr<sdsl::bit_vector> > B_x;
 std::vector<sdsl::bit_vector> B_x;
 
-sdsl::rank_support_v<> rank_B_L;
-sdsl::select_support_mcl<> select_B_L;
+sdsl::rank_support_sd<> rank_B_L;
+sdsl::select_support_sd<> select_B_L;
+sdsl::rank_support_sd<> rank_B_F;
+sdsl::select_support_sd<> select_B_F;
+
+// std::vector<std::unique_ptr<sdsl::rank_support_v< > > > B_x_ranks;
 
 void deserialize_data(char *inputFileName) {
     std::ifstream in_file(inputFileName, std::ios::in | std::ios::binary);
@@ -54,20 +60,24 @@ void deserialize_data(char *inputFileName) {
     char_to_index.resize(CHAR_COUNT);
     in_file.read(reinterpret_cast<char*>(&char_to_index[0]), CHAR_COUNT*sizeof(char_to_index[0]));
 
-    B_L.resize(n);
-    B_L.load(in_file);
+    B_L_sparse.load(in_file);
 
     // Building the rank and select data structures for querying B_L
-    rank_B_L = sdsl::rank_support_v<>(&B_L); // usage example: rank_B_L(i) gives the rank result at index i on B_L
-    select_B_L = sdsl::select_support_mcl<>(&B_L); // usage example: select_B_L(i) gives the select result at index i on B_L
+    rank_B_L = sdsl::rank_support_sd<>(&B_L_sparse); // usage example: rank_B_L(i) gives the rank result at index i on B_L
+    select_B_L = sdsl::select_support_sd<>(&B_L_sparse); // usage example: select_B_L(i) gives the select result at index i on B_L
 
-    B_F.resize(n);
-    B_F.load(in_file);
+    B_F_sparse.load(in_file);
+
+    // Building the rank and select data structures for querying B_L
+    rank_B_F = sdsl::rank_support_sd<>(&B_F_sparse); // usage example: rank_B_L(i) gives the rank result at index i on B_L
+    select_B_F = sdsl::select_support_sd<>(&B_F_sparse); // usage example: select_B_L(i) gives the select result at index i on B_L
 
     for (int i = 0; i < sigma; i++) {
         sdsl::bit_vector new_b_vector;
         new_b_vector.load(in_file);
         B_x.push_back(new_b_vector);
+        // Building the rank data structure for the B_x bit vectors
+        // B_x_ranks.emplace_back(sdsl::rank_support_v< >(&B_x[i]));
     }
 
     in_file.close();
@@ -81,8 +91,8 @@ int main(int argc, char** argv) {
     std::cerr << "All the arrays and bit vectors are loaded.\n\n";
 
     // For inspecting how the vectors look on a small example
-    /* std::cerr << "B_L: " << B_L << "\n";
-    std::cerr << "B_F: " << B_F << "\n";
+    /* std::cerr << "B_L: " << B_L_sparse << "\n";
+    std::cerr << "B_F: " << B_F_sparse << "\n";
     std::cerr << "H_L: ";
     for (int i = 0; i < r; i++)
         std::cerr << H_L[i];

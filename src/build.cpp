@@ -1,4 +1,5 @@
 #include <sdsl/int_vector.hpp>
+#include <sdsl/sd_vector.hpp>
 #include <sdsl/rank_support.hpp>
 #include <vector>
 #include <string>
@@ -32,6 +33,10 @@ std::vector<int> char_to_index;
 // The data structures needed for the assignment
 sdsl::bit_vector B_F;
 sdsl::bit_vector B_L;
+
+sdsl::sd_vector B_F_sparse;
+sdsl::sd_vector B_L_sparse;
+
 std::vector<int> C;
 std::vector<char> H_L;
 std::vector<std::unique_ptr<sdsl::bit_vector> > B_x;
@@ -170,8 +175,8 @@ void serialize_data(char *outputFileName) {
     out_file.write(reinterpret_cast<char*>(&alphabet[0]), sigma*sizeof(alphabet[0]));
     out_file.write(reinterpret_cast<char*>(&char_to_index[0]), CHAR_COUNT*sizeof(char_to_index[0]));
 
-    B_L.serialize(out_file);
-    B_F.serialize(out_file);
+    B_L_sparse.serialize(out_file);
+    B_F_sparse.serialize(out_file);
 
     for (int i = 0; i < sigma; i++) {
         auto B_x_i = *B_x[i];
@@ -218,10 +223,16 @@ int main(int argc, char** argv) {
     }
     std::cerr << "B_F is created.\n";
 
+    // Create the sparse bit vectors for B_F and B_L
+    B_F_sparse = sdsl::sd_vector<>(B_F);
+    B_L_sparse = sdsl::sd_vector<>(B_L);
+    std::cerr << "Sparse bit vectors are created.\n";
+
+
     // For inspecting how the vectors look on a small example
     /* std::cerr << reconstruct() << "\n";
-    std::cerr << "B_L: " << B_L << "\n";
-    std::cerr << "B_F: " << B_F << "\n";
+    std::cerr << "B_L: " << B_L_sparse << "\n";
+    std::cerr << "B_F: " << B_F_sparse << "\n";
     std::cerr << "H_L: ";
     for (int i = 0; i < r; i++)
         std::cerr << H_L[i];

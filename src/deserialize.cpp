@@ -1,5 +1,7 @@
 #include <sdsl/int_vector.hpp>
 #include <sdsl/rank_support.hpp>
+#include <sdsl/bit_vectors.hpp>
+
 #include <vector>
 #include <string>
 
@@ -21,8 +23,11 @@ sdsl::bit_vector B_F;
 sdsl::bit_vector B_L;
 std::vector<int> C;
 std::vector<char> H_L;
-// std::vector<std::unique_ptr<sdsl::bit_vector> > B_X;
-std::vector<sdsl::bit_vector> B_X;
+// std::vector<std::unique_ptr<sdsl::bit_vector> > B_x;
+std::vector<sdsl::bit_vector> B_x;
+
+sdsl::rank_support_v<> rank_B_L;
+sdsl::select_support_mcl<> select_B_L;
 
 void deserialize_data(char *inputFileName) {
     std::ifstream in_file(inputFileName, std::ios::in | std::ios::binary);
@@ -52,13 +57,17 @@ void deserialize_data(char *inputFileName) {
     B_L.resize(n);
     B_L.load(in_file);
 
+    // Building the rank and select data structures for querying B_L
+    rank_B_L = sdsl::rank_support_v<>(&B_L); // usage example: rank_B_L(i) gives the rank result at index i on B_L
+    select_B_L = sdsl::select_support_mcl<>(&B_L); // usage example: select_B_L(i) gives the select result at index i on B_L
+
     B_F.resize(n);
     B_F.load(in_file);
 
     for (int i = 0; i < sigma; i++) {
         sdsl::bit_vector new_b_vector;
         new_b_vector.load(in_file);
-        B_X.push_back(new_b_vector);
+        B_x.push_back(new_b_vector);
     }
 
     in_file.close();
@@ -79,7 +88,7 @@ int main(int argc, char** argv) {
         std::cerr << H_L[i];
     std::cerr << "\n";
     for (int i = 0; i < sigma; i++) {
-        std::cerr << "B_" << i << ": " << B_X[i] << "\n";
+        std::cerr << "B_" << i << ": " << B_x[i] << "\n";
     } */
 
 }

@@ -78,7 +78,7 @@ void build_BL(char* BWT, int n) {
 
     sigma = 0;
     std::cerr << "The count of each character in the BWT:\n";
-    for (int i = 1; i < CHAR_COUNT; i++) {
+    for (int i = 0; i < CHAR_COUNT; i++) {
         if (chars[i] != 0) {
             std::cerr << "\t" << static_cast<char>(i) << ": " << chars[i] << "\n";
             counts.push_back(chars[i]);

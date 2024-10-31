@@ -34,7 +34,7 @@ sdsl::bit_vector B_F;
 sdsl::bit_vector B_L;
 std::vector<int> C;
 std::vector<char> H_L;
-std::vector<std::unique_ptr<sdsl::bit_vector> > B_X;
+std::vector<std::unique_ptr<sdsl::bit_vector> > B_x;
 
 void build_BL(char* BWT, int n) {
     char last_char = ' ';
@@ -86,7 +86,7 @@ void build_BL(char* BWT, int n) {
             char_to_index[i] = sigma;
             sigma += 1;
             sdsl::bit_vector* new_b_vector = new sdsl::bit_vector(r, 0);
-            B_X.emplace_back(std::unique_ptr<sdsl::bit_vector>(new_b_vector));
+            B_x.emplace_back(std::unique_ptr<sdsl::bit_vector>(new_b_vector));
 
             sdsl::bit_vector* new_occ_vector = new sdsl::bit_vector(n, 0);
             occs.emplace_back(std::unique_ptr<sdsl::bit_vector>(new_occ_vector));
@@ -109,7 +109,7 @@ void build_C() {
 
 void fill_occs_and_bs(int n, int r) {
     for (int i = 0; i < r; i++) {
-        (*B_X[char_to_index[static_cast<int>(H_L[i])]])[i] = 1;
+        (*B_x[char_to_index[static_cast<int>(H_L[i])]])[i] = 1;
     }
 
     for (int i = 0; i < n; i ++) {
@@ -174,8 +174,8 @@ void serialize_data(char *outputFileName) {
     B_F.serialize(out_file);
 
     for (int i = 0; i < sigma; i++) {
-        auto B_X_i = *B_X[i];
-        B_X_i.serialize(out_file);
+        auto B_x_i = *B_x[i];
+        B_x_i.serialize(out_file);
     }
 
     out_file.close();
@@ -198,9 +198,9 @@ int main(int argc, char** argv) {
     std::cerr << "n: " << n << "\n";
     std::cerr << "r: " << r << "\n";
 
-    // build the B_X bit vectors and occs bit vectors
+    // build the B_x bit vectors and occs bit vectors
     fill_occs_and_bs(n, r);
-    std::cerr << "B_X bit vectors are created.\n";
+    std::cerr << "B_x bit vectors are created.\n";
 
     // create the rank objects for the occurance bit vectors
     for (auto& occ: occs) {
@@ -227,7 +227,7 @@ int main(int argc, char** argv) {
         std::cerr << H_L[i];
     std::cerr << "\n";
     for (int i = 0; i < sigma; i++) {
-        std::cerr << "B_" << i << ": " << *B_X[i] << "\n";
+        std::cerr << "B_" << i << ": " << *B_x[i] << "\n";
     } */
     
     serialize_data(argv[2]);

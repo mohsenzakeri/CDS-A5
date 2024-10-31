@@ -25,15 +25,17 @@ sdsl::sd_vector B_L_sparse;
 
 std::vector<int> C;
 std::vector<char> H_L;
-// std::vector<std::unique_ptr<sdsl::bit_vector> > B_x;
-std::vector<sdsl::bit_vector> B_x;
+std::vector<std::unique_ptr<sdsl::bit_vector> > B_x;
 
+// Rank and Select data structures on B_F and B_L
 sdsl::rank_support_sd<> rank_B_L;
 sdsl::select_support_sd<> select_B_L;
 sdsl::rank_support_sd<> rank_B_F;
 sdsl::select_support_sd<> select_B_F;
 
-// std::vector<std::unique_ptr<sdsl::rank_support_v< > > > B_x_ranks;
+// Rank data structure for B_x bit vectors
+std::vector<std::unique_ptr<sdsl::rank_support_v< > > > B_x_ranks;
+
 
 void deserialize_data(char *inputFileName) {
     std::ifstream in_file(inputFileName, std::ios::in | std::ios::binary);
@@ -73,12 +75,17 @@ void deserialize_data(char *inputFileName) {
     select_B_F = sdsl::select_support_sd<>(&B_F_sparse); // usage example: select_B_L(i) gives the select result at index i on B_L
 
     for (int i = 0; i < sigma; i++) {
-        sdsl::bit_vector new_b_vector;
-        new_b_vector.load(in_file);
-        B_x.push_back(new_b_vector);
-        // Building the rank data structure for the B_x bit vectors
-        // B_x_ranks.emplace_back(sdsl::rank_support_v< >(&B_x[i]));
+        auto new_b_vector = std::make_unique<sdsl::bit_vector>();
+        new_b_vector->load(in_file);
+        B_x.push_back(std::move(new_b_vector));
     }
+
+    // create the rank objects for the B_x bit vectors
+    for (auto& B: B_x) {
+        B_x_ranks.emplace_back(std::unique_ptr<sdsl::rank_support_v< > >(new sdsl::rank_support_v< >(B.get())));
+    }
+    // Example: code to perform rank query on B_2 at position 10:
+    // std::cerr << (*B_x_ranks[2])(10) << "\n";
 
     in_file.close();
 }
@@ -98,7 +105,7 @@ int main(int argc, char** argv) {
         std::cerr << H_L[i];
     std::cerr << "\n";
     for (int i = 0; i < sigma; i++) {
-        std::cerr << "B_" << i << ": " << B_x[i] << "\n";
+        std::cerr << "B_" << i << ": " << *B_x[i] << "\n";
     } */
 
 }

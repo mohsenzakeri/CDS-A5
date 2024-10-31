@@ -228,5 +228,5 @@ int main(int argc, char** argv) {
     } */
     
     serialize_data(argv[2]);
-    std::cerr << "\nThe output is stored at " << argv[2] << "\n";
+    std::cerr << "\nThe output is stored at " << argv[2] << "\n\n";
 }

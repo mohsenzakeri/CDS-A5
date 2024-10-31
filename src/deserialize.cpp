@@ -3,9 +3,18 @@
 #include <vector>
 #include <string>
 
+#define CHAR_COUNT 256
+
 int n = 0;
 int r = 0;
 int sigma = 0;
+
+// all the characters in T or BWT(T)
+std::vector<unsigned char> alphabet;
+
+// to map a character to the index
+// Ex. #:0, $:1, A:2, C:3, G:4, T:5
+std::vector<int> char_to_index;
 
 // The data structures needed for the assignment
 sdsl::bit_vector B_F;
@@ -30,6 +39,15 @@ void deserialize_data(char *inputFileName) {
 
     C.resize(sigma);
     in_file.read(reinterpret_cast<char*>(&C[0]), sigma*sizeof(C[0]));
+
+    alphabet.resize(sigma);
+    in_file.read(reinterpret_cast<char*>(&alphabet[0]), sigma*sizeof(alphabet[0]));
+    std::cerr << "\nThe alphabet in the BWT:\n";
+    for (int i = 0; i < sigma; i++)
+        std::cerr << "\t" << i << " -> " << static_cast<int>(alphabet[i]) << "(" << alphabet[i] << ")\n";
+    std::cerr << "\n";
+    char_to_index.resize(CHAR_COUNT);
+    in_file.read(reinterpret_cast<char*>(&char_to_index[0]), CHAR_COUNT*sizeof(char_to_index[0]));
 
     B_L.resize(n);
     B_L.load(in_file);

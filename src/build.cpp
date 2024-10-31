@@ -26,7 +26,7 @@ std::vector<int> counts;
 std::vector<unsigned char> alphabet;
 
 // to map a character to the index
-// Ex. #:0, $:1, A:2, C:3, G:4, T:5 
+// Ex. #:0, $:1, A:2, C:3, G:4, T:5
 std::vector<int> char_to_index;
 
 // The data structures needed for the assignment
@@ -166,6 +166,9 @@ void serialize_data(char *outputFileName) {
     out_file.write(reinterpret_cast<char*>(&H_L[0]), r*sizeof(H_L[0]));
 
     out_file.write(reinterpret_cast<char*>(&C[0]), sigma*sizeof(C[0]));
+
+    out_file.write(reinterpret_cast<char*>(&alphabet[0]), sigma*sizeof(alphabet[0]));
+    out_file.write(reinterpret_cast<char*>(&char_to_index[0]), CHAR_COUNT*sizeof(char_to_index[0]));
 
     B_L.serialize(out_file);
     B_F.serialize(out_file);

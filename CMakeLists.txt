@@ -24,7 +24,7 @@ if(NOT sdsl_POPULATED)
   add_subdirectory(${sdsl_SOURCE_DIR} ${sdsl_BINARY_DIR} EXCLUDE_FROM_ALL)
 endif()
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++14")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++17")
 # compile with address sanitizer
 # add_compile_options(-fsanitize=address)
 # add_link_options(-fsanitize=address)

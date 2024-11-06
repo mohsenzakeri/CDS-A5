@@ -105,7 +105,8 @@ int main(int argc, char** argv) {
         std::cerr << H_L[i];
     std::cerr << "\n";
     for (int i = 0; i < sigma; i++) {
-        std::cerr << "B_" << i << ": " << *B_x[i] << "\n";
+        std::cerr << "B_" << i << ": " << *B_x[i] << "\t";
+        std::cerr << "C[" << i << "] = " << C[i] << "\n";
     } */
 
 }

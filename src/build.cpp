@@ -7,6 +7,7 @@
 #define CHAR_COUNT 256
 
 std::vector<int> chars(CHAR_COUNT, 0);
+std::vector<int> chars_runs(CHAR_COUNT, 0);
 
 char *BWT;
 int n = 0;
@@ -22,6 +23,10 @@ std::vector<std::unique_ptr<sdsl::rank_support_v< > > > occs_rank;
 
 // to keep the count of each character, used in computing C
 std::vector<int> counts;
+std::vector<int> C_BWT;
+
+// to keep the count of how many runs of each character exist
+std::vector<int> counts_runs;
 
 // all the characters in T or BWT(T)
 std::vector<unsigned char> alphabet;
@@ -49,12 +54,15 @@ void build_BL(char* BWT, int n) {
 
         char current_char = BWT[i];
 
-        // increase count of the characters to find the characters that exist in the BWT
+        // increament the count of the characters to find the characters that exist in the BWT
         chars[current_char] += 1;
 
         if (last_char == ' ' or current_char != last_char) {
             // a new run is starting
             r += 1;
+
+            // increament the counter for the number of runs with the current character
+            chars_runs[current_char] += 1;
 
             // save the run head character in H_L
             H_L.push_back(current_char);
@@ -95,19 +103,26 @@ void build_BL(char* BWT, int n) {
 
             sdsl::bit_vector* new_occ_vector = new sdsl::bit_vector(n, 0);
             occs.emplace_back(std::unique_ptr<sdsl::bit_vector>(new_occ_vector));
+
+            if (chars_runs[i] != 0 ) {
+                counts_runs.push_back(chars_runs[i]);
+            }
         }
     }
     std::cerr << "\n";
 
 }
 
-void build_C() {
+void build_Cs() {
     int count = 0;
-
+    int count_runs = 0;
     for (int i = 0; i < counts.size(); i++) {
 
-        C.push_back(count);
+        C_BWT.push_back(count);
         count += counts[i];
+
+        C.push_back(count_runs);
+        count_runs += counts_runs[i];
 
     }
 }
@@ -128,7 +143,7 @@ int LF(int bwt_row) {
     int alphabet_index = char_to_index[static_cast<int>(BWT[bwt_row])];
 
     // add up the counts of the smaller characters
-    lf += C[alphabet_index];
+    lf += C_BWT[alphabet_index];
 
     // add the rank of the bwt_row
     auto& occ_rank = *occs_rank[alphabet_index];
@@ -187,8 +202,10 @@ void serialize_data(char *outputFileName) {
 }
 
 int main(int argc, char** argv) {
-    std::cerr << "usage: build DATASET.bwt DATASET.ri\n";
+    std::cerr << "\nusage: build DATASET.bwt DATASET.ri\n";
     std::cerr << "The DATASET.ri is the output of this program.\n\n";
+
+    if (argc != 3) exit(0);
 
     loadBWT(argv[1]);
 
@@ -214,7 +231,7 @@ int main(int argc, char** argv) {
 
     sdsl::rank_support_v<> rank_B_L = sdsl::rank_support_v<>(&B_L);
 
-    build_C();
+    build_Cs();
     std::cerr << "C array is created.\n";
 
     for (int i = 0; i < r; i++) {
@@ -238,7 +255,8 @@ int main(int argc, char** argv) {
         std::cerr << H_L[i];
     std::cerr << "\n";
     for (int i = 0; i < sigma; i++) {
-        std::cerr << "B_" << i << ": " << *B_x[i] << "\n";
+        std::cerr << "B_" << i << ": " << *B_x[i] << "\t";
+        std::cerr << "C[" << i << "] = " << C[i] << "\n";
     } */
     
     serialize_data(argv[2]);

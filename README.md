@@ -6,7 +6,7 @@ This repository contains code to generate data structures for assignment 5.
 The following dependencies are required:
 - `sdsl` (Succinct Data Structure Library)
 - `cmake`
-- `gcc`
+- `gcc` (C++17 is required to compile)
 
 ### Build Instructions
 To build from source:

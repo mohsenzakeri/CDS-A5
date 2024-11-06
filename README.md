@@ -1,4 +1,4 @@
-# Assignment 5 - Compact Data Structure
+# Assignment 5 - Compact Data Structures
 
 This repository contains code to generate data structures for assignment 5.
 
